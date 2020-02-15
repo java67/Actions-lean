@@ -9,9 +9,8 @@
 #sed -i 's/192.168.1.1/192.168.50.5/g' package/base-files/files/bin/config_generate
 rm -rf package/lean/luci-app-ssr-plus package/lean/default-settings
 
-        for i in $( ls mypatch ); do
-            echo Applying mypatch $i
-            patch -p1 < mypatch/$i
-        done
-        
-        
+for i in $( ls mypatch ); do
+echo Applying mypatch $i
+patch -p1 < mypatch/$i
+done
+  
