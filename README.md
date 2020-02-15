@@ -1,4 +1,3 @@
-https://github.com/lunatickochiya/Actions-OpenWrt/commit/ffce6b2e8359c3b8acf9dcab820e083102617644#diff-f282d53d13b3a9d7da026886ec183044
 
 # Actions-OpenWrt mod
 
