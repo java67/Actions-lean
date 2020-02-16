@@ -13,6 +13,8 @@
 源码更新交流学习：点击链接加入群聊 ：https://jq.qq.com/?_wv=1027&k=5QgVYsC  
 群号： 286754582
 
+当前commit版本号 ：r20.2.15  3379474d827c2445088458455abd46e4e32246b5
+
 Build OpenWrt using GitHub Actions
 
 [Read the details in my blog (in Chinese) | 中文教程](https://p3terx.com/archives/build-openwrt-with-github-actions.html)
