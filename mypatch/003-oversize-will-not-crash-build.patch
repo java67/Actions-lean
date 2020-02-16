@@ -1,0 +1,187 @@
+diff --git a/feeds.conf.default b/feeds.conf.default
+index 1c6155c..ab2ec10 100644
+--- a/feeds.conf.default
++++ b/feeds.conf.default
+@@ -1,4 +1,4 @@
+ src-git packages https://github.com/coolsnowwolf/packages
+-src-git luci https://github.com/coolsnowwolf/luci
++src-git luci https://github.com/lunatickochiya/lean-luci-mod
+ src-git routing https://git.openwrt.org/feed/routing.git;openwrt-19.07
+ #src-git telephony https://git.openwrt.org/feed/telephony.git;openwrt-19.07
+diff --git a/include/image-commands.mk b/include/image-commands.mk
+index 4cf1293..fa4282c 100644
+--- a/include/image-commands.mk
++++ b/include/image-commands.mk
+@@ -83,8 +83,11 @@ define Build/netgear-chk
+ 		-o $@.new \
+ 		-k $@ \
+ 		-b $(NETGEAR_BOARD_ID) \
+-		$(if $(NETGEAR_REGION),-r $(NETGEAR_REGION),)
+-	mv $@.new $@
++		$(if $(NETGEAR_REGION),-r $(NETGEAR_REGION),); \
++	if [ -e "$@.new" ]; then \
++		mv $@.new $@; \
++	fi; \
++	echo ""
+ endef
+ 
+ define Build/netgear-dni
+@@ -92,8 +95,11 @@ define Build/netgear-dni
+ 		-B $(NETGEAR_BOARD_ID) -v $(VERSION_DIST).$(firstword $(subst -, ,$(REVISION))) \
+ 		$(if $(NETGEAR_HW_ID),-H $(NETGEAR_HW_ID)) \
+ 		-r "$(1)" \
+-		-i $@ -o $@.new
+-	mv $@.new $@
++		-i $@ -o $@.new; \
++	if [ -e "$@.new" ]; then \
++		mv $@.new $@; \
++	fi; \
++	echo ""
+ endef
+ 
+ define Build/append-squashfs-fakeroot-be
+@@ -379,9 +385,12 @@ define Build/tplink-v2-image
+ 		-H $(TPLINK_HWID) -W $(TPLINK_HWREV) \
+ 		-w $(TPLINK_HWREVADD) -F "$(TPLINK_FLASHLAYOUT)" \
+ 		-T $(TPLINK_HVERSION) -V "ver. 2.0" -a 0x4 -j \
+-		-k $(IMAGE_KERNEL) -r $(IMAGE_ROOTFS) -o $@.new $(1)
+-	cat $@.new >> $@
+-	rm -rf $@.new
++		-k $(IMAGE_KERNEL) -r $(IMAGE_ROOTFS) -o $@.new $(1); \
++	if [ -e "$@.new" ]; then \
++		cat $@.new >> $@; \
++		rm -rf $@.new; \
++	fi; \
++	echo ""
+ endef
+ 
+ json_quote=$(subst ','\'',$(subst ",\",$(1)))
+diff --git a/include/image.mk b/include/image.mk
+index 26da4d6..b931412 100644
+--- a/include/image.mk
++++ b/include/image.mk
+@@ -182,8 +182,9 @@ ifeq ($(strip $(call kernel_patchver_ge,4.18.0)),1)
+ endif
+ 
+ define Image/pad-to
+-	dd if=$(1) of=$(1).new bs=$(2) conv=sync
+-	mv $(1).new $(1)
++	dd if=$(1) of=$(1).new bs=$(2) conv=sync; \
++	mv $(1).new $(1); \
++	echo ""
+ endef
+ 
+ ROOTFS_PARTSIZE=$(shell echo $$(($(CONFIG_TARGET_ROOTFS_PARTSIZE)*1024*1024)))
+diff --git a/target/linux/ar71xx/image/generic.mk b/target/linux/ar71xx/image/generic.mk
+index bc59ded..85140d6 100644
+--- a/target/linux/ar71xx/image/generic.mk
++++ b/target/linux/ar71xx/image/generic.mk
+@@ -25,13 +25,16 @@ define Build/mkwrggimg
+ endef
+ 
+ define Build/mkdapimg2
+-	$(STAGING_DIR_HOST)/bin/mkdapimg2 \
++	if [ -e "$@" ]; then \
++		$(STAGING_DIR_HOST)/bin/mkdapimg2 \
+ 		-i $@ -o $@.new \
+ 		-s $(DAP_SIGNATURE) \
+ 		-v $(VERSION_DIST)-$(firstword $(subst +, ,$(firstword $(subst -, ,$(REVISION))))) \
+-		-r Default \
+-		$(if $(1),-k $(1))
+-	mv $@.new $@
++		-r Default; \
++		$(if $(1),-k $(1)) \
++		mv $@.new $@; \
++	fi ; \
++	echo ""
+ endef
+ 
+ define Build/netgear-squashfs
+diff --git a/target/linux/ar71xx/image/legacy.mk b/target/linux/ar71xx/image/legacy.mk
+index 3ee79ce..1d3f5a8 100644
+--- a/target/linux/ar71xx/image/legacy.mk
++++ b/target/linux/ar71xx/image/legacy.mk
+@@ -836,7 +836,8 @@ define Image/Build/Zcomax
+ 			-k $(KDIR_TMP)/vmlinux-$(2).uImage \
+ 			-r $(KDIR)/root.$(1) \
+ 			-o $(call imgname,$(1),$(2))-factory.img; \
+-	fi
++	fi ; \
++	echo ""
+ endef
+ 
+ 
+diff --git a/target/linux/ramips/image/Makefile b/target/linux/ramips/image/Makefile
+index 1d865aa..89211c0 100644
+--- a/target/linux/ramips/image/Makefile
++++ b/target/linux/ramips/image/Makefile
+@@ -112,22 +112,26 @@ define Build/elx-header
+ endef
+ 
+ define Build/umedia-header
+-	fix-u-media-header -T 0x46 -B $(1) -i $@ -o $@.new && mv $@.new $@
++	fix-u-media-header -T 0x46 -B $(1) -i $@ -o $@.new && mv $@.new $@; \
++	echo ""
+ endef
+ 
+ define Build/edimax-header
+-	$(STAGING_DIR_HOST)/bin/mkedimaximg -i $@ -o $@.new $(1)
+-	@mv $@.new $@
++	$(STAGING_DIR_HOST)/bin/mkedimaximg -i $@ -o $@.new $(1); \
++	@mv $@.new $@; \
++	echo ""
+ endef
+ 
+ define Build/poray-header
+-	$(STAGING_DIR_HOST)/bin/mkporayfw $(1) -f $@ -o $@.new
+-	mv $@.new $@
++	$(STAGING_DIR_HOST)/bin/mkporayfw $(1) -f $@ -o $@.new; \
++	mv $@.new $@; \
++	echo ""
+ endef
+ 
+ define Build/wrg-header
+-	mkwrgimg -i $@ -d "/dev/mtdblock/2" -s $(1) -o $@.new
+-	mv $@.new $@
++	mkwrgimg -i $@ -d "/dev/mtdblock/2" -s $(1) -o $@.new; \
++	mv $@.new $@; \
++	echo ""
+ endef
+ 
+ # combine kernel and rootfs into one image
+@@ -139,7 +143,8 @@ define Build/mkdlinkfw
+ 		-r $(IMAGE_ROOTFS) \
+ 		-o $@ \
+ 		$(if $(DLINK_IMAGE_OFFSET), -O $(DLINK_IMAGE_OFFSET)) \
+-		-s $(DLINK_FIRMWARE_SIZE)
++		-s $(DLINK_FIRMWARE_SIZE); \
++		echo ""
+ endef
+ 
+ define Build/mkdlinkfw-factory
+@@ -148,8 +153,11 @@ define Build/mkdlinkfw-factory
+ 		-F $@ \
+ 		-o $@.new \
+ 		$(if $(DLINK_IMAGE_OFFSET), -O $(DLINK_IMAGE_OFFSET)) \
+-		-s $(DLINK_FIRMWARE_SIZE)
+-	mv $@.new $@
++		-s $(DLINK_FIRMWARE_SIZE); \
++	if [ -e "$@.new" ]; then \
++		mv $@.new $@; \
++	fi; \
++	echo ""
+ endef
+ 
+ define Build/zyimage
+@@ -170,8 +178,9 @@ define Build/sercom-footer
+ endef
+ 
+ define Build/fonfxcimage
+-	uimage_padhdr -i $@ -o $@.new
+-	mv $@.new $@
++	uimage_padhdr -i $@ -o $@.new; \
++	mv $@.new $@; \
++	echo ""
+ endef
+ 
+ ifeq ($(SUBTARGET),rt288x)

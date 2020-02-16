@@ -75,6 +75,7 @@ jobs:
       run: |
         chmod +x $DIY_SH $AFB_SH
         cd openwrt
+        git checkout 3379474d827c2445088458455abd46e4e32246b5
         ../$DIY_SH
       
     - name: Update feeds
