@@ -5,6 +5,14 @@
 [![GitHub Stars](https://img.shields.io/github/stars/P3TERX/Actions-OpenWrt.svg?style=flat-square&label=Stars&logo=github)](https://github.com/P3TERX/Actions-OpenWrt/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/P3TERX/Actions-OpenWrt.svg?style=flat-square&label=Forks&logo=github)](https://github.com/P3TERX/Actions-OpenWrt/fork)
 
+基于P3TERX版本制作 
+
+特色功能： 可以替换package，给源码打入patch， 加入自己的东西
+单独上传ipk文件包，单独上传sysupgrade包（你也可以自定义上传ubi，也可以指定你的机型上传，首先你要知道你的机型文件名）
+
+源码更新交流学习：点击链接加入群聊 ：https://jq.qq.com/?_wv=1027&k=5QgVYsC  
+群号： 286754582
+
 Build OpenWrt using GitHub Actions
 
 [Read the details in my blog (in Chinese) | 中文教程](https://p3terx.com/archives/build-openwrt-with-github-actions.html)
